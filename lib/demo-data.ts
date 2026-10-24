@@ -1,0 +1,163 @@
+import type {
+  Experience,
+  Message,
+  Profile,
+  Project,
+  ProjectMedia,
+  Skill,
+} from "./types";
+
+export const demoProfile: Profile = {
+  id: "demo",
+  full_name: "Aiyebola Taye",
+  headline: "Full-stack engineer building products people actually use.",
+  bio: "I design and ship end-to-end products — from Postgres schemas and auth flows to the interface people touch every day. I currently build and run a corporate learning platform at Legend Internet alongside four products of my own: Shopmoda, Handoff, OpenSchool ERP, and Campus Depo. I care about software that is fast, legible, and honest about what it does.",
+  location: "Abuja, Nigeria",
+  email: "taye.aiyebola@gmail.com",
+  phone: "+234 905 301 9597",
+  avatar_url: null,
+  resume_url: null,
+  github_url: "https://github.com/Aiyebolataye",
+  linkedin_url: null,
+  twitter_url: null,
+  availability: "Open to remote backend and full-stack roles",
+  updated_at: null,
+};
+
+export const demoProjects: Project[] = [
+  {
+    id: "p1",
+    slug: "shopmoda",
+    title: "Shopmoda",
+    tagline: "A live marketplace for second-hand fashion in Nigeria.",
+    description:
+      "Shopmoda lets sellers list pre-owned clothing and buyers check out in a few taps. Built the storefront, seller dashboard, Paystack payments, Prembly NIN verification, and an offer/escrow flow that releases funds on delivery confirmation. Nine API endpoints, role-based access, and a cron job that releases held funds automatically.",
+    tech_stack: ["Next.js", "TypeScript", "PostgreSQL", "Paystack", "Prembly", "Vercel"],
+    live_url: "https://shopmoda.vercel.app",
+    repo_url: null,
+    cover_image_url: null,
+    status: "live",
+    featured: true,
+    published: true,
+    sort_order: 1,
+    created_at: null,
+    updated_at: null,
+  },
+  {
+    id: "p2",
+    slug: "handoff",
+    title: "Handoff",
+    tagline: "Courier dispatch and delivery tracking for small logistics teams.",
+    description:
+      "A dispatch platform that connects senders, riders, and operations in one place. Riders get assignments on their phones, customers track parcels with a code, and ops see every order on a live board. Built the order lifecycle, rider assignment, status tracking, and the admin console.",
+    tech_stack: ["Next.js", "TypeScript", "PostgreSQL", "Prisma", "Docker", "Vercel"],
+    live_url: "https://handoff-courier.vercel.app",
+    repo_url: null,
+    cover_image_url: null,
+    status: "live",
+    featured: true,
+    published: true,
+    sort_order: 2,
+    created_at: null,
+    updated_at: null,
+  },
+  {
+    id: "p3",
+    slug: "openschool-erp",
+    title: "OpenSchool ERP",
+    tagline: "School operations in one place — students, staff, fees, and results.",
+    description:
+      "A multi-tenant school management system built as a monorepo. Covers admissions, student records, staff roles, fee tracking, and results. Delivered role-based access control with a full audit trail, plus a typed API shared across the admin and parent-facing apps.",
+    tech_stack: ["Next.js", "TypeScript", "PostgreSQL", "Monorepo", "Tailwind CSS", "RBAC"],
+    live_url: null,
+    repo_url: "https://github.com/Aiyebolataye/openschool-erp",
+    cover_image_url: null,
+    status: "in-development",
+    featured: true,
+    published: true,
+    sort_order: 3,
+    created_at: null,
+    updated_at: null,
+  },
+  {
+    id: "p4",
+    slug: "campus-depo",
+    title: "Campus Depo",
+    tagline: "A student marketplace for buying and selling on campus.",
+    description:
+      "A Flutter marketplace built for campus life. Students list items, browse by category, and message sellers. Includes a Next.js admin dashboard for moderation, listings, and user management.",
+    tech_stack: ["Flutter", "Firebase", "Next.js", "TypeScript"],
+    live_url: "https://admin-dashboard-rho-lake.vercel.app",
+    repo_url: null,
+    cover_image_url: null,
+    status: "in-development",
+    featured: true,
+    published: true,
+    sort_order: 4,
+    created_at: null,
+    updated_at: null,
+  },
+];
+
+export const demoExperience: Experience[] = [
+  {
+    id: "e1",
+    company: "Legend Internet",
+    role: "Full-Stack Developer",
+    location: "Abuja, Nigeria",
+    start_date: "2024-01",
+    end_date: null,
+    current: true,
+    description:
+      "Build and maintain a corporate learning platform used by staff across the organisation. Own the product end to end: feature scoping, implementation, release, and support. Also lead development on four products — Shopmoda, Handoff, OpenSchool ERP, and Campus Depo.",
+    sort_order: 1,
+    created_at: null,
+  },
+  {
+    id: "e2",
+    company: "Federal Capital Territory Administration (FCTA)",
+    role: "IT Support Intern",
+    location: "Abuja, Nigeria",
+    start_date: "2024-01",
+    end_date: "2024-06",
+    current: false,
+    description:
+      "Supported a 25-person IT team across hardware, network, and end-user issues. Documented recurring faults and fixes, and helped staff get back to work quickly during peak periods.",
+    sort_order: 2,
+    created_at: null,
+  },
+  {
+    id: "e3",
+    company: "Nigerian Building and Road Research Institute (NBRRI)",
+    role: "IT Support Intern",
+    location: "Abuja, Nigeria",
+    start_date: "2023-01",
+    end_date: "2023-06",
+    current: false,
+    description:
+      "Worked in a five-person IT team handling system setup, troubleshooting, and day-to-day user support. Kept workstations and shared systems running for research staff.",
+    sort_order: 3,
+    created_at: null,
+  },
+];
+
+export const demoSkills: Skill[] = [
+  { id: "s1", category: "Frontend", name: "React", sort_order: 1 },
+  { id: "s2", category: "Frontend", name: "Next.js", sort_order: 2 },
+  { id: "s3", category: "Frontend", name: "TypeScript", sort_order: 3 },
+  { id: "s4", category: "Frontend", name: "Tailwind CSS", sort_order: 4 },
+  { id: "s5", category: "Backend", name: "Node.js", sort_order: 1 },
+  { id: "s6", category: "Backend", name: "PostgreSQL", sort_order: 2 },
+  { id: "s7", category: "Backend", name: "Supabase", sort_order: 3 },
+  { id: "s8", category: "Backend", name: "Prisma", sort_order: 4 },
+  { id: "s9", category: "Backend", name: "REST APIs", sort_order: 5 },
+  { id: "s10", category: "Mobile", name: "Flutter", sort_order: 1 },
+  { id: "s11", category: "Mobile", name: "Firebase", sort_order: 2 },
+  { id: "s12", category: "Tools", name: "Git", sort_order: 1 },
+  { id: "s13", category: "Tools", name: "Docker", sort_order: 2 },
+  { id: "s14", category: "Tools", name: "Vercel", sort_order: 3 },
+  { id: "s15", category: "Tools", name: "GitHub Actions", sort_order: 4 },
+];
+
+export const demoMedia: ProjectMedia[] = [];
+export const demoMessages: Message[] = [];
