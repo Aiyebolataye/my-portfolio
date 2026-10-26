@@ -7,6 +7,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
 import { useRouter } from "next/navigation";
 
+const ADMIN_EMAIL = 'aiyebolataye@gmail.com';
 const initialState = { ok: true, message: "" };
 
 function SubmitButton() {
@@ -32,15 +33,16 @@ function SubmitButton() {
 export function LoginForm({ next }: { next: string }) {
   const router = useRouter();
   const [state, formAction] = useActionState(async (_prev: any, formData: FormData) => {
-    const email = String(formData.get('email') ?? '').trim();
+    const email = String(formData.get('email') ?? '').trim().toLowerCase();
     const password = String(formData.get('password') ?? '').trim();
+    if (email !== ADMIN_EMAIL) return { ok: false, message: 'Unauthorized' };
     if (!email || !password) return { ok: false, message: 'Email and password are required.' };
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push(next.startsWith('/') ? next : '/admin');
       return { ok: true, message: '' };
     } catch (e: any) {
-      return { ok: false, message: e?.message || 'Sign in failed' };
+      return { ok: false, message: 'Unauthorized' };
     }
   }, initialState);
 

@@ -6,6 +6,8 @@ import { auth } from '@/lib/firebase/client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
+const ADMIN_EMAIL = 'aiyebolataye@gmail.com';
+
 export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -14,11 +16,15 @@ export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
+      if (!u || u.email?.toLowerCase() !== ADMIN_EMAIL) {
+        signOut(auth).catch(() => {});
+        router.replace('/login?next=/admin');
+        setUser(null);
+        setReady(true);
+        return;
+      }
       setUser(u);
       setReady(true);
-      if (!u) {
-        router.replace('/login?next=/admin');
-      }
     });
     return () => unsub();
   }, [router]);
