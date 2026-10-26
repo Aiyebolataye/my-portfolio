@@ -73,24 +73,26 @@ export function ExperienceForm({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Start month" htmlFor="start_date">
+          <Field label="Start year" htmlFor="start_date">
             <input
               id="start_date"
               name="start_date"
-              type="month"
+              type="text"
               required
               defaultValue={item?.start_date ?? ""}
               className={inputClass}
+              placeholder="2026"
             />
           </Field>
-          <Field label="End month" htmlFor="end_date">
+          <Field label="End year" htmlFor="end_date">
             <input
               id="end_date"
               name="end_date"
-              type="month"
+              type="text"
               disabled={current}
               defaultValue={item?.end_date ?? ""}
               className={`${inputClass} disabled:opacity-50`}
+              placeholder="Present or 2025"
             />
           </Field>
         </div>
