@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { ExperienceForm } from "@/components/admin/experience-form";
-import { SetupNotice } from "@/components/admin/setup-notice";
 import { AdminPageHeader } from "@/components/admin/ui";
 import { getExperience } from "@/lib/data";
 

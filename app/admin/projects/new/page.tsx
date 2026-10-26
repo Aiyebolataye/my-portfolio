@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { ProjectForm } from "@/components/admin/project-form";
-import { SetupNotice } from "@/components/admin/setup-notice";
 import { AdminPageHeader } from "@/components/admin/ui";
 import { getProjects } from "@/lib/data";
 

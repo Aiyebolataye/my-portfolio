@@ -1,5 +1,4 @@
 import { Check, Mail, MailOpen, Trash2 } from "lucide-react";
-import { SetupNotice } from "@/components/admin/setup-notice";
 import { AdminPageHeader, Card } from "@/components/admin/ui";
 import { deleteMessage, toggleMessageRead } from "@/lib/actions";
 import { getMessages } from "@/lib/data";

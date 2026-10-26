@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { DeleteButton } from "@/components/admin/delete-button";
-import { SetupNotice } from "@/components/admin/setup-notice";
 import { AdminPageHeader, Banner, Card } from "@/components/admin/ui";
 import { deleteExperience } from "@/lib/actions";
 import { getExperience } from "@/lib/data";

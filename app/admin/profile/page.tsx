@@ -1,6 +1,5 @@
 import { Plus, X } from "lucide-react";
 import { ProfileForm } from "@/components/admin/profile-form";
-import { SetupNotice } from "@/components/admin/setup-notice";
 import { AdminPageHeader, Card, inputClass, labelClass } from "@/components/admin/ui";
 import { addSkill, deleteSkill } from "@/lib/actions";
 import { getProfile, getSkills } from "@/lib/data";

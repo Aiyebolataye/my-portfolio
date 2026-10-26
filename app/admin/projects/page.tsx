@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, Plus } from "lucide-react";
 import { DeleteButton } from "@/components/admin/delete-button";
-import { SetupNotice } from "@/components/admin/setup-notice";
 import { AdminPageHeader, Banner, Card } from "@/components/admin/ui";
 import { StatusBadge } from "@/components/status-badge";
 import { deleteProject } from "@/lib/actions";
