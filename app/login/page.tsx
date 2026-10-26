@@ -43,7 +43,6 @@ export default async function LoginPage({
         </div>
 
         <p className="mt-6 text-center font-mono text-[10.5px] uppercase tracking-[0.16em] text-muted">
-          aiye bolataye@gmail.com
         </p>
       </div>
     </div>
