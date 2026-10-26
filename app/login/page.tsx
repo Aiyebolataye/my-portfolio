@@ -1,7 +1,6 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
-import { hasSupabaseEnv } from "@/lib/config";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
@@ -35,24 +34,16 @@ export default async function LoginPage({
             Admin sign in
           </h1>
           <p className="mt-1.5 text-[13px] text-muted">
-            Manage projects, experience, profile, and messages.
+            Sign in with Firebase Auth
           </p>
 
           <div className="mt-6">
             <LoginForm next={next ?? "/admin"} />
           </div>
-
-          {!hasSupabaseEnv ? (
-            <p className="mt-5 rounded-xl border border-amber-500/25 bg-amber-500/10 p-3 text-[12px] leading-relaxed text-amber-700 dark:text-amber-300">
-              Supabase is not configured. Add your project URL and anon key to
-              <code className="mx-1 font-mono">.env.local</code>, then restart the
-              dev server.
-            </p>
-          ) : null}
         </div>
 
         <p className="mt-6 text-center font-mono text-[10.5px] uppercase tracking-[0.16em] text-muted">
-          Single-owner access · Sessions managed by Supabase Auth
+          aiye bolataye@gmail.com
         </p>
       </div>
     </div>
