@@ -26,19 +26,29 @@ export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   if (!user) return null;
   return (
     <div>
-      <div className="border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 overflow-x-auto px-4 py-2 sm:px-6">
-          <nav className="flex min-w-max items-center gap-1">
-            <Link href="/admin" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] hover:bg-surface-2">Admin</Link>
-            <Link href="/admin/projects" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">Projects</Link>
-            <Link href="/admin/experience" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">Experience</Link>
-            <Link href="/admin/profile" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">Profile</Link>
-            <Link href="/admin/messages" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">Messages</Link>
-            <Link href="/" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">View site</Link>
-          </nav>
-          <button onClick={() => signOut(auth)} className="inline-flex shrink-0 items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">Sign out</button>
+      <header className="sticky top-0 z-40 border-b border-line bg-canvas/90 backdrop-blur">
+        <div className="mx-auto flex h-12 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <div className="flex items-center gap-4">
+            <Link href="/admin" className="text-sm font-medium">Dashboard</Link>
+            <nav className="hidden items-center gap-4 md:flex">
+              <Link href="/admin/projects" className="text-sm text-muted hover:text-ink">Projects</Link>
+              <Link href="/admin/experience" className="text-sm text-muted hover:text-ink">Experience</Link>
+              <Link href="/admin/profile" className="text-sm text-muted hover:text-ink">Profile</Link>
+              <Link href="/admin/messages" className="text-sm text-muted hover:text-ink">Messages</Link>
+            </nav>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="text-sm text-muted hover:text-ink">View site</Link>
+            <button onClick={() => signOut(auth)} className="text-sm text-muted hover:text-ink">Sign out</button>
+          </div>
         </div>
-      </div>
+        <div className="mx-auto flex max-w-6xl items-center gap-4 overflow-x-auto px-4 pb-2 md:hidden sm:px-6">
+          <Link href="/admin/projects" className="shrink-0 text-sm text-muted hover:text-ink">Projects</Link>
+          <Link href="/admin/experience" className="shrink-0 text-sm text-muted hover:text-ink">Experience</Link>
+          <Link href="/admin/profile" className="shrink-0 text-sm text-muted hover:text-ink">Profile</Link>
+          <Link href="/admin/messages" className="shrink-0 text-sm text-muted hover:text-ink">Messages</Link>
+        </div>
+      </header>
       {children}
     </div>
   );
