@@ -33,8 +33,6 @@ export default async function AdminProjectsPage({
         }
       />
 
-      <SetupNotice />
-
       {saved ? <Banner kind="ok">Project saved.</Banner> : null}
       {deleted ? <Banner kind="ok">Project deleted.</Banner> : null}
 

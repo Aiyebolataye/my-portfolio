@@ -33,8 +33,6 @@ export default async function AdminExperiencePage({
         }
       />
 
-      <SetupNotice />
-
       {saved ? <Banner kind="ok">Role saved.</Banner> : null}
       {deleted ? <Banner kind="ok">Role deleted.</Banner> : null}
 

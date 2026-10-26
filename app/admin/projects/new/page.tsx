@@ -25,8 +25,6 @@ export default async function NewProjectPage() {
         description="Add the story, links, and media that make this piece of work legible."
       />
 
-      <SetupNotice />
-
       <ProjectForm nextSortOrder={nextSortOrder} />
     </div>
   );

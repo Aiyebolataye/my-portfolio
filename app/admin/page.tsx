@@ -7,7 +7,6 @@ import {
   Mail,
   TrendingUp,
 } from "lucide-react";
-import { SetupNotice } from "@/components/admin/setup-notice";
 import { ViewsChart } from "@/components/admin/views-chart";
 import { AdminPageHeader, Card } from "@/components/admin/ui";
 import { formatDate } from "@/lib/format";
@@ -27,8 +26,6 @@ export default async function AdminOverviewPage() {
         title="Overview"
         description="Traffic, content, and inbox at a glance."
       />
-
-      <SetupNotice />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard

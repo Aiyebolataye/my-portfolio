@@ -22,8 +22,6 @@ export default async function NewExperiencePage() {
 
       <AdminPageHeader title="Add role" />
 
-      <SetupNotice />
-
       <ExperienceForm nextSortOrder={nextSortOrder} />
     </div>
   );

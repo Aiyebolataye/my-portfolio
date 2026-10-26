@@ -18,10 +18,8 @@ export default async function AdminProfilePage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Profile"
-        description="Your name, bio, links, photo, and résumé."
+        description="Your name, bio, links, photo, and rAcsumAc."
       />
-
-      <SetupNotice />
 
       <ProfileForm profile={profile} />
 

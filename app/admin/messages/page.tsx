@@ -13,10 +13,8 @@ export default async function AdminMessagesPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Messages"
-        description={`${messages.length} total · ${unread} unread`}
+        description={`${messages.length} total A� ${unread} unread`}
       />
-
-      <SetupNotice />
 
       <Card>
         {messages.length === 0 ? (
