@@ -34,7 +34,7 @@ export default async function LoginPage({
             Admin sign in
           </h1>
           <p className="mt-1.5 text-[13px] text-muted">
-            Sign in with Firebase Auth
+            Sign in
           </p>
 
           <div className="mt-6">
