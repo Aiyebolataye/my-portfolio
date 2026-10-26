@@ -27,16 +27,16 @@ export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   return (
     <div>
       <div className="border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-2 sm:px-6">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 overflow-x-auto px-4 py-2 sm:px-6">
+          <nav className="flex min-w-max items-center gap-1">
             <Link href="/admin" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] hover:bg-surface-2">Admin</Link>
             <Link href="/admin/projects" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">Projects</Link>
             <Link href="/admin/experience" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">Experience</Link>
             <Link href="/admin/profile" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">Profile</Link>
             <Link href="/admin/messages" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">Messages</Link>
             <Link href="/" className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">View site</Link>
-          </div>
-          <button onClick={() => signOut(auth)} className="inline-flex items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">Sign out</button>
+          </nav>
+          <button onClick={() => signOut(auth)} className="inline-flex shrink-0 items-center rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted hover:bg-surface-2 hover:text-ink">Sign out</button>
         </div>
       </div>
       {children}
