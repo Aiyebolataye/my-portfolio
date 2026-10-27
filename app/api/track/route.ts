@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { hasSupabaseEnv } from "@/lib/config";
-import { createClient } from "@/lib/supabase/server";
+import { hasFirebaseEnv } from "@/lib/config";
+import { adminDb } from "@/lib/firebase/admin";
 
 export async function POST(request: Request) {
-  if (!hasSupabaseEnv) {
+  if (!hasFirebaseEnv) {
     return NextResponse.json({ ok: true, demo: true });
   }
 
@@ -22,8 +22,7 @@ export async function POST(request: Request) {
         ? body.referrer.slice(0, 500)
         : null;
 
-    const supabase = await createClient();
-    await supabase.from("page_views").insert({ path, referrer });
+    await adminDb.collection("page_views").add({ path, referrer, created_at: new Date().toISOString() });
   } catch {
     // Tracking must never break the page.
   }

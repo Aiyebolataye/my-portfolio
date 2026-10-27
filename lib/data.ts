@@ -1,4 +1,5 @@
-import { hasSupabaseEnv } from "./config";
+import { hasFirebaseEnv } from "./config";
+import { adminDb } from "./firebase/admin";
 import {
   demoExperience,
   demoMessages,
@@ -6,7 +7,6 @@ import {
   demoProjects,
   demoSkills,
 } from "./demo-data";
-import { createClient } from "./supabase/server";
 import type {
   Experience,
   Message,
@@ -17,109 +17,113 @@ import type {
 } from "./types";
 
 async function query<T>(
-  run: (supabase: Awaited<ReturnType<typeof createClient>>) => Promise<T>,
+  run: (db: typeof adminDb) => Promise<T>,
   fallback: T
 ): Promise<T> {
-  if (!hasSupabaseEnv) return fallback;
+  if (!hasFirebaseEnv) return fallback;
   try {
-    const supabase = await createClient();
-    return await run(supabase);
+    return await run(adminDb);
   } catch {
     return fallback;
   }
 }
 
 export async function getProfile(): Promise<Profile> {
-  return query(async (supabase) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .order("updated_at", { ascending: false })
+  return query(async (db) => {
+    const snapshot = await db
+      .collection("profiles")
+      .orderBy("updated_at", "desc")
       .limit(1)
-      .maybeSingle();
-    return (data as Profile | null) ?? demoProfile;
+      .get();
+    if (snapshot.empty) return demoProfile;
+    const doc = snapshot.docs[0];
+    return { id: doc.id, ...doc.data() } as Profile;
   }, demoProfile);
 }
 
 export async function getProjects(options?: {
   includeDrafts?: boolean;
 }): Promise<Project[]> {
-  return query(async (supabase) => {
-    let request = supabase
-      .from("projects")
-      .select("*")
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: false });
-    if (!options?.includeDrafts) request = request.eq("published", true);
-    const { data } = await request;
-    return (data as Project[] | null) ?? demoProjects;
+  return query(async (db) => {
+    const collection = db.collection("projects");
+    let snapshot;
+    if (options?.includeDrafts) {
+      snapshot = await collection.orderBy("sort_order", "asc").orderBy("created_at", "desc").get();
+    } else {
+      snapshot = await collection.where("published", "==", true).orderBy("sort_order", "asc").orderBy("created_at", "desc").get();
+    }
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Project));
   }, demoProjects);
 }
 
 export async function getProject(slug: string): Promise<Project | null> {
-  return query(async (supabase) => {
-    const { data } = await supabase
-      .from("projects")
-      .select("*")
-      .eq("slug", slug)
-      .maybeSingle();
-    return (data as Project | null) ?? null;
+  return query(async (db) => {
+    const snapshot = await db
+      .collection("projects")
+      .where("slug", "==", slug)
+      .limit(1)
+      .get();
+    if (snapshot.empty) return null;
+    const doc = snapshot.docs[0];
+    return { id: doc.id, ...doc.data() } as Project;
   }, demoProjects.find((project) => project.slug === slug) ?? null);
 }
 
 export async function getProjectById(id: string): Promise<Project | null> {
-  return query(async (supabase) => {
-    const { data } = await supabase
-      .from("projects")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle();
-    return (data as Project | null) ?? null;
+  return query(async (db) => {
+    const snapshot = await db
+      .collection("projects")
+      .where("id", "==", id)
+      .limit(1)
+      .get();
+    if (snapshot.empty) return null;
+    const doc = snapshot.docs[0];
+    return { id: doc.id, ...doc.data() } as Project;
   }, demoProjects.find((project) => project.id === id) ?? null);
 }
 
 export async function getProjectMedia(
   projectId: string
 ): Promise<ProjectMedia[]> {
-  return query(async (supabase) => {
-    const { data } = await supabase
-      .from("project_media")
-      .select("*")
-      .eq("project_id", projectId)
-      .order("sort_order", { ascending: true });
-    return (data as ProjectMedia[] | null) ?? [];
+  return query(async (db) => {
+    const snapshot = await db
+      .collection("project_media")
+      .where("project_id", "==", projectId)
+      .orderBy("sort_order", "asc")
+      .get();
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as ProjectMedia));
   }, []);
 }
 
 export async function getExperience(): Promise<Experience[]> {
-  return query(async (supabase) => {
-    const { data } = await supabase
-      .from("experience")
-      .select("*")
-      .order("sort_order", { ascending: true });
-    return (data as Experience[] | null) ?? demoExperience;
+  return query(async (db) => {
+    const snapshot = await db
+      .collection("experience")
+      .orderBy("sort_order", "asc")
+      .get();
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Experience));
   }, demoExperience);
 }
 
 export async function getSkills(): Promise<Skill[]> {
-  return query(async (supabase) => {
-    const { data } = await supabase
-      .from("skills")
-      .select("*")
-      .order("category", { ascending: true })
-      .order("sort_order", { ascending: true });
-    return (data as Skill[] | null) ?? demoSkills;
+  return query(async (db) => {
+    const snapshot = await db
+      .collection("skills")
+      .orderBy("category", "asc")
+      .orderBy("sort_order", "asc")
+      .get();
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Skill));
   }, demoSkills);
 }
 
 export async function getMessages(): Promise<Message[]> {
-  return query(async (supabase) => {
-    const { data } = await supabase
-      .from("messages")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(100);
-    return (data as Message[] | null) ?? demoMessages;
+  return query(async (db) => {
+    const snapshot = await db
+      .collection("messages")
+      .orderBy("created_at", "desc")
+      .limit(100)
+      .get();
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message));
   }, demoMessages);
 }
 
@@ -144,32 +148,34 @@ const emptyStats: DashboardStats = {
 };
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  return query(async (supabase) => {
+  return query(async (db) => {
     const since = new Date();
     since.setDate(since.getDate() - 13);
     since.setHours(0, 0, 0, 0);
 
     const [total, recent, unread, projectCount, publishedCount, views] =
       await Promise.all([
-        supabase.from("page_views").select("*", { count: "exact", head: true }),
-        supabase
-          .from("page_views")
-          .select("*", { count: "exact", head: true })
-          .gte("created_at", new Date(Date.now() - 7 * 864e5).toISOString()),
-        supabase
-          .from("messages")
-          .select("*", { count: "exact", head: true })
-          .eq("read", false),
-        supabase.from("projects").select("*", { count: "exact", head: true }),
-        supabase
-          .from("projects")
-          .select("*", { count: "exact", head: true })
-          .eq("published", true),
-        supabase
-          .from("page_views")
-          .select("path, created_at")
-          .gte("created_at", since.toISOString())
-          .limit(5000),
+        db.collection("page_views").get().then(snapshot => snapshot.size),
+        db
+          .collection("page_views")
+          .where("created_at", ">=", since.toISOString())
+          .get()
+          .then(snapshot => snapshot.size),
+        db
+          .collection("messages")
+          .where("read", "==", false)
+          .get()
+          .then(snapshot => snapshot.size),
+        db.collection("projects").get().then(snapshot => snapshot.size),
+        db
+          .collection("projects")
+          .where("published", "==", true)
+          .get()
+          .then(snapshot => snapshot.size),
+        db
+          .collection("page_views")
+          .where("created_at", ">=", since.toISOString())
+          .get(),
       ]);
 
     const buckets = new Map<string, number>();
@@ -180,19 +186,20 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     }
 
     const pageCounts = new Map<string, number>();
-    for (const row of views.data ?? []) {
-      const day = String(row.created_at).slice(0, 10);
+    for (const doc of views.docs ?? []) {
+      const data = doc.data();
+      const day = String(data.created_at).slice(0, 10);
       if (buckets.has(day)) buckets.set(day, (buckets.get(day) ?? 0) + 1);
-      const path = row.path ?? "/";
+      const path = data.path ?? "/";
       pageCounts.set(path, (pageCounts.get(path) ?? 0) + 1);
     }
 
     return {
-      totalViews: total.count ?? 0,
-      viewsLast7Days: recent.count ?? 0,
-      unreadMessages: unread.count ?? 0,
-      projectCount: projectCount.count ?? demoProjects.length,
-      publishedCount: publishedCount.count ?? 0,
+      totalViews: total ?? 0,
+      viewsLast7Days: recent ?? 0,
+      unreadMessages: unread ?? 0,
+      projectCount: projectCount ?? demoProjects.length,
+      publishedCount: publishedCount ?? 0,
       viewsByDay: Array.from(buckets, ([day, count]) => ({
         day: day.slice(5),
         views: count,

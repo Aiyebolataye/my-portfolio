@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { hasSupabaseEnv } from "./config";
-import { createClient } from "./supabase/server";
+import { hasFirebaseEnv } from "./config";
+import { adminAuth, adminDb } from "./firebase/admin";
 import type { ProjectStatus } from "./types";
 
 export type ActionState = {
@@ -50,11 +50,11 @@ export async function signIn(
   _prev: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  if (!hasSupabaseEnv) {
+  if (!hasFirebaseEnv) {
     return {
       ok: false,
       message:
-        "Supabase is not configured yet. Add your keys to .env.local and restart the dev server.",
+        "Firebase is not configured yet. Add your keys to .env.local and restart the dev server.",
     };
   }
 
@@ -66,21 +66,21 @@ export async function signIn(
     return { ok: false, message: "Email and password are required." };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-  if (error) {
-    return { ok: false, message: error.message };
+  try {
+    const userRecord = await adminAuth.getUserByEmail(email);
+    if (!userRecord.emailVerified) {
+      return { ok: false, message: "Please verify your email address." };
+    }
+    redirect(next.startsWith("/") ? next : "/admin");
+  } catch (error: any) {
+    if (error.code === 'auth/user-not-found') {
+      return { ok: false, message: "Invalid email or password." };
+    }
+    return { ok: false, message: "Authentication failed." };
   }
-
-  redirect(next.startsWith("/") ? next : "/admin");
 }
 
 export async function signOut(): Promise<void> {
-  if (hasSupabaseEnv) {
-    const supabase = await createClient();
-    await supabase.auth.signOut();
-  }
   redirect("/login");
 }
 
@@ -109,20 +109,18 @@ export async function sendMessage(
     return { ok: false, message: "That email address does not look right." };
   }
 
-  if (!hasSupabaseEnv) {
+  if (!hasFirebaseEnv) {
     return {
       ok: true,
       message:
-        "Demo mode: this form is not connected to a database yet. Add Supabase keys to receive messages.",
+        "Demo mode: this form is not connected to a database yet. Add Firebase keys to receive messages.",
     };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("messages")
-    .insert({ name, email, message });
-
-  if (error) return initialError;
+  const docId = crypto.randomUUID();
+  await adminDb
+    .collection("messages")
+    .add({ id: docId, name, email, message, created_at: new Date().toISOString(), read: false });
 
   revalidatePath("/admin/messages");
   return { ok: true, message: "Thanks — your message is on its way." };
@@ -136,8 +134,8 @@ export async function saveProject(
   _prev: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  if (!hasSupabaseEnv) {
-    return { ok: false, message: "Connect Supabase before saving projects." };
+  if (!hasFirebaseEnv) {
+    return { ok: false, message: "Connect Firebase before saving projects." };
   }
 
   const id = text(formData, "id");
@@ -166,14 +164,15 @@ export async function saveProject(
     featured: formData.get("featured") === "on",
     published: formData.get("published") === "on",
     sort_order: Number(text(formData, "sort_order") || 0),
+    created_at: new Date().toISOString(),
   };
 
-  const supabase = await createClient();
-  const { error } = id
-    ? await supabase.from("projects").update(payload).eq("id", id)
-    : await supabase.from("projects").insert(payload);
-
-  if (error) return { ok: false, message: error.message };
+  if (id) {
+    await adminDb.collection("projects").doc(id).update(payload);
+  } else {
+    const docRef = await adminDb.collection("projects").add(payload);
+    await docRef.update({ id: docRef.id });
+  }
 
   revalidateAll();
   revalidatePath(`/projects/${slug}`);
@@ -181,29 +180,28 @@ export async function saveProject(
 }
 
 export async function deleteProject(formData: FormData): Promise<void> {
-  if (!hasSupabaseEnv) redirect("/admin/projects");
+  if (!hasFirebaseEnv) redirect("/admin/projects");
   const id = text(formData, "id");
   if (id) {
-    const supabase = await createClient();
-    await supabase.from("projects").delete().eq("id", id);
+    await adminDb.collection("projects").doc(id).delete();
   }
   revalidateAll();
   redirect("/admin/projects?deleted=1");
 }
 
 export async function addProjectMedia(formData: FormData): Promise<void> {
-  if (!hasSupabaseEnv) return;
+  if (!hasFirebaseEnv) return;
   const projectId = text(formData, "project_id");
   const url = text(formData, "url");
   if (!projectId || !url) return;
 
-  const supabase = await createClient();
-  await supabase.from("project_media").insert({
+  await adminDb.collection("project_media").add({
     project_id: projectId,
     type: text(formData, "type") === "video" ? "video" : "image",
     url,
     caption: nullable(formData, "caption"),
     sort_order: Number(text(formData, "sort_order") || 0),
+    created_at: new Date().toISOString(),
   });
 
   revalidatePath(`/admin/projects/${projectId}`);
@@ -211,13 +209,12 @@ export async function addProjectMedia(formData: FormData): Promise<void> {
 }
 
 export async function deleteProjectMedia(formData: FormData): Promise<void> {
-  if (!hasSupabaseEnv) return;
+  if (!hasFirebaseEnv) return;
   const id = text(formData, "id");
   const projectId = text(formData, "project_id");
   if (!id) return;
 
-  const supabase = await createClient();
-  await supabase.from("project_media").delete().eq("id", id);
+  await adminDb.collection("project_media").doc(id).delete();
 
   revalidatePath(`/admin/projects/${projectId}`);
 }
@@ -230,8 +227,8 @@ export async function saveExperience(
   _prev: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  if (!hasSupabaseEnv) {
-    return { ok: false, message: "Connect Supabase before saving experience." };
+  if (!hasFirebaseEnv) {
+    return { ok: false, message: "Connect Firebase before saving experience." };
   }
 
   const id = text(formData, "id");
@@ -256,25 +253,25 @@ export async function saveExperience(
     current,
     description: nullable(formData, "description"),
     sort_order: Number(text(formData, "sort_order") || 0),
+    created_at: new Date().toISOString(),
   };
 
-  const supabase = await createClient();
-  const { error } = id
-    ? await supabase.from("experience").update(payload).eq("id", id)
-    : await supabase.from("experience").insert(payload);
-
-  if (error) return { ok: false, message: error.message };
+  if (id) {
+    await adminDb.collection("experience").doc(id).update(payload);
+  } else {
+    const docRef = await adminDb.collection("experience").add(payload);
+    await docRef.update({ id: docRef.id });
+  }
 
   revalidateAll();
   redirect("/admin/experience?saved=1");
 }
 
 export async function deleteExperience(formData: FormData): Promise<void> {
-  if (!hasSupabaseEnv) redirect("/admin/experience");
+  if (!hasFirebaseEnv) redirect("/admin/experience");
   const id = text(formData, "id");
   if (id) {
-    const supabase = await createClient();
-    await supabase.from("experience").delete().eq("id", id);
+    await adminDb.collection("experience").doc(id).delete();
   }
   revalidateAll();
   redirect("/admin/experience?deleted=1");
@@ -288,8 +285,8 @@ export async function updateProfile(
   _prev: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  if (!hasSupabaseEnv) {
-    return { ok: false, message: "Connect Supabase before saving your profile." };
+  if (!hasFirebaseEnv) {
+    return { ok: false, message: "Connect Firebase before saving your profile." };
   }
 
   const id = text(formData, "id");
@@ -309,37 +306,41 @@ export async function updateProfile(
     linkedin_url: nullable(formData, "linkedin_url"),
     twitter_url: nullable(formData, "twitter_url"),
     availability: nullable(formData, "availability"),
+    updated_at: new Date().toISOString(),
   };
 
-  const supabase = await createClient();
-  const { error } = id
-    ? await supabase.from("profiles").update(payload).eq("id", id)
-    : await supabase.from("profiles").insert(payload);
-
-  if (error) return { ok: false, message: error.message };
+  if (id) {
+    await adminDb.collection("profiles").doc(id).update(payload);
+  } else {
+    const docRef = await adminDb.collection("profiles").add(payload);
+    await docRef.update({ id: docRef.id });
+  }
 
   revalidateAll();
   return { ok: true, message: "Profile saved." };
 }
 
 export async function addSkill(formData: FormData): Promise<void> {
-  if (!hasSupabaseEnv) return;
+  if (!hasFirebaseEnv) return;
   const name = text(formData, "name");
   const category = text(formData, "category") || "Other";
   if (!name) return;
 
-  const supabase = await createClient();
-  await supabase.from("skills").insert({ name, category, sort_order: 0 });
+  await adminDb.collection("skills").add({
+    name,
+    category,
+    sort_order: 0,
+    created_at: new Date().toISOString(),
+  });
   revalidateAll();
 }
 
 export async function deleteSkill(formData: FormData): Promise<void> {
-  if (!hasSupabaseEnv) return;
+  if (!hasFirebaseEnv) return;
   const id = text(formData, "id");
   if (!id) return;
 
-  const supabase = await createClient();
-  await supabase.from("skills").delete().eq("id", id);
+  await adminDb.collection("skills").doc(id).delete();
   revalidateAll();
 }
 
@@ -348,24 +349,22 @@ export async function deleteSkill(formData: FormData): Promise<void> {
 // ---------------------------------------------------------------------------
 
 export async function toggleMessageRead(formData: FormData): Promise<void> {
-  if (!hasSupabaseEnv) return;
+  if (!hasFirebaseEnv) return;
   const id = text(formData, "id");
   const read = text(formData, "read") === "true";
   if (!id) return;
 
-  const supabase = await createClient();
-  await supabase.from("messages").update({ read: !read }).eq("id", id);
+  await adminDb.collection("messages").doc(id).update({ read: !read });
   revalidatePath("/admin/messages");
   revalidatePath("/admin");
 }
 
 export async function deleteMessage(formData: FormData): Promise<void> {
-  if (!hasSupabaseEnv) return;
+  if (!hasFirebaseEnv) return;
   const id = text(formData, "id");
   if (!id) return;
 
-  const supabase = await createClient();
-  await supabase.from("messages").delete().eq("id", id);
+  await adminDb.collection("messages").doc(id).delete();
   revalidatePath("/admin/messages");
   revalidatePath("/admin");
 }
