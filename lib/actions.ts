@@ -98,7 +98,7 @@ export async function sendMessage(
   const trap = text(formData, "company_website");
 
   if (trap) {
-    return { ok: true, message: "Thanks — your message is on its way." };
+    return { ok: true, message: "Thanks! Your message is on its way." };
   }
 
   if (!name || !email || !message) {
@@ -123,7 +123,7 @@ export async function sendMessage(
     .add({ id: docId, name, email, message, created_at: new Date().toISOString(), read: false });
 
   revalidatePath("/admin/messages");
-  return { ok: true, message: "Thanks — your message is on its way." };
+  return { ok: true, message: "Thanks! Your message is on its way." };
 }
 
 // ---------------------------------------------------------------------------
