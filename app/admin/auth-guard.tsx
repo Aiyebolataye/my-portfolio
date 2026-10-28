@@ -1,23 +1,15 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase/client';
+import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 const ADMIN_EMAIL = 'aiyebolataye@gmail.com';
 
 export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
-  const [ready, setReady] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const router = useRouter();
+  const [ready] = useState(true);
+  const [user] = useState<any>({ email: ADMIN_EMAIL });
   const pathname = usePathname();
-
-  useEffect(() => {
-    setUser({ email: ADMIN_EMAIL });
-    setReady(true);
-  }, [router]);
 
   if (!ready) return null;
   if (!user) return null;
@@ -39,7 +31,6 @@ export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-3">
             <Link href="/" className="text-sm text-muted hover:text-ink">View site</Link>
-            <button onClick={() => signOut(auth)} className="text-sm text-muted hover:text-ink">Sign out</button>
           </div>
         </div>
         <div className="mx-auto flex max-w-6xl items-center gap-4 overflow-x-auto px-4 pb-2 md:hidden sm:px-6">
