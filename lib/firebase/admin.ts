@@ -12,7 +12,14 @@ if (getApps().length) {
     if (key && key.trim().startsWith("{")) {
       try {
         const serviceAccount = JSON.parse(key);
-        app = initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID });
+        app = initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "portfolio-aiyebola" });
+      } catch {
+        app = initializeApp({ projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "portfolio-aiyebola" });
+      }
+    } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS && process.env.GOOGLE_APPLICATION_CREDENTIALS.trim().startsWith("{")) {
+      try {
+        const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+        app = initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "portfolio-aiyebola" });
       } catch {
         app = initializeApp({ projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "portfolio-aiyebola" });
       }
