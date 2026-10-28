@@ -5,11 +5,10 @@ export async function POST(request: Request) {
   if (!hasFirebaseEnv) {
     return NextResponse.json({ ok: true, demo: true });
   }
-  
+
   try {
     const { adminDb } = await import("@/lib/firebase/admin");
 
-  try {
     const body = (await request.json()) as {
       path?: unknown;
       referrer?: unknown;
@@ -24,7 +23,9 @@ export async function POST(request: Request) {
         ? body.referrer.slice(0, 500)
         : null;
 
-    await adminDb.collection("page_views").add({ path, referrer, created_at: new Date().toISOString() });
+    await adminDb
+      .collection("page_views")
+      .add({ path, referrer, created_at: new Date().toISOString() });
   } catch {
     // Tracking must never break the page.
   }
