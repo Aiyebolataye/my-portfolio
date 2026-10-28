@@ -23,10 +23,11 @@ export default async function HomePage() {
     getSkills().catch(() => [] as any),
   ]);
 
-  const skillGroups = skills.reduce<Record<string, string[]>>(
-    (groups, skill) => {
-      groups[skill.category] = groups[skill.category] ?? [];
-      groups[skill.category].push(skill.name);
+  const skillGroups = ((skills as any[]) || []).reduce(
+    (groups: Record<string, string[]>, skill: any) => {
+      const category = skill.category || "Other";
+      groups[category] = groups[category] ?? [];
+      groups[category].push(skill.name);
       return groups;
     },
     {}
@@ -120,7 +121,7 @@ export default async function HomePage() {
         </Reveal>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2">
-          {projects.map((project, index) => (
+          {((projects as any[]) || []).map((project: any, index: number) => (
             <Reveal key={project.id} delay={index * 60}>
               <ProjectCard project={project} />
             </Reveal>
@@ -184,19 +185,19 @@ export default async function HomePage() {
               title="Engineer first, product owner always."
             />
             <div className="prose-editorial mt-6 max-w-xl text-[14.5px] leading-relaxed text-muted">
-              {profile.bio?.split("\n").map((paragraph, index) => (
+              {(profile?.bio ?? "").split("\n").map((paragraph: string, index: number) => (
                 <p key={index}>{paragraph}</p>
               ))}
             </div>
 
             <div className="mt-10 space-y-6">
-              {Object.entries(skillGroups).map(([category, names]) => (
+              {Object.entries(skillGroups as Record<string, string[]>).map(([category, names]) => (
                 <div key={category}>
                   <p className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-muted">
                     {category}
                   </p>
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    {names.map((name) => (
+                    {(names as string[]).map((name: string) => (
                       <span
                         key={name}
                         className="rounded-full border border-line bg-surface px-3 py-1 text-[12.5px] text-ink/80"
