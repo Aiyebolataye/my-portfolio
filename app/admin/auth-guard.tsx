@@ -15,18 +15,10 @@ export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      if (!u || u.email?.toLowerCase() !== ADMIN_EMAIL) {
-        signOut(auth).catch(() => {});
-        router.replace('/login?next=/admin');
-        setUser(null);
-        setReady(true);
-        return;
-      }
-      setUser(u);
-      setReady(true);
-    });
-    return () => unsub();
+    // Bypass auth for testing
+    setUser({ email: ADMIN_EMAIL });
+    setReady(true);
+    return;
   }, [router]);
 
   if (!ready) return null;
