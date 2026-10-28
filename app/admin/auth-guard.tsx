@@ -15,10 +15,8 @@ export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Bypass auth for testing
     setUser({ email: ADMIN_EMAIL });
     setReady(true);
-    return;
   }, [router]);
 
   if (!ready) return null;
