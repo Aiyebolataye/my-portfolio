@@ -1,20 +1,6 @@
 import { hasFirebaseEnv } from "./config";
 import { demoExperience, demoMessages, demoProfile, demoProjects, demoSkills } from "./demo-data";
 import type { Experience, Message, Profile, Project, ProjectMedia, Skill } from "./types";
-  demoExperience,
-  demoMessages,
-  demoProfile,
-  demoProjects,
-  demoSkills,
-} from "./demo-data";
-import type {
-  Experience,
-  Message,
-  Profile,
-  Project,
-  ProjectMedia,
-  Skill,
-} from "./types";
 
 async function query<T>(
   run: (db: any) => Promise<T>,
@@ -53,7 +39,7 @@ export async function getProjects(options?: {
     } else {
       snapshot = await collection.where("published", "==", true).orderBy("sort_order", "asc").orderBy("created_at", "desc").get();
     }
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Project));
+    return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Project));
   }, demoProjects);
 }
 
@@ -66,7 +52,7 @@ export async function getProject(slug: string): Promise<Project | null> {
       .get();
     if (snapshot.empty) return null;
     const doc = snapshot.docs[0];
-    return { id: doc.id, ...doc.data() } as Project;
+    return { id: doc.id, ...(doc.data ? doc.data() : {}) } as Project;
   }, demoProjects.find((project) => project.slug === slug) ?? null);
 }
 
@@ -79,7 +65,7 @@ export async function getProjectById(id: string): Promise<Project | null> {
       .get();
     if (snapshot.empty) return null;
     const doc = snapshot.docs[0];
-    return { id: doc.id, ...doc.data() } as Project;
+    return { id: doc.id, ...(doc.data ? doc.data() : {}) } as Project;
   }, demoProjects.find((project) => project.id === id) ?? null);
 }
 
@@ -92,7 +78,7 @@ export async function getProjectMedia(
       .where("project_id", "==", projectId)
       .orderBy("sort_order", "asc")
       .get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as ProjectMedia));
+    return snapshot.docs.map((doc: any) => ({ id: doc.id, ...(doc.data ? doc.data() : {}) } as ProjectMedia));
   }, []);
 }
 
@@ -102,7 +88,7 @@ export async function getExperience(): Promise<Experience[]> {
       .collection("experience")
       .orderBy("sort_order", "asc")
       .get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Experience));
+    return snapshot.docs.map((doc: any) => ({ id: doc.id, ...(doc.data ? doc.data() : {}) } as Experience));
   }, demoExperience);
 }
 
@@ -113,7 +99,7 @@ export async function getSkills(): Promise<Skill[]> {
       .orderBy("category", "asc")
       .orderBy("sort_order", "asc")
       .get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Skill));
+    return snapshot.docs.map((doc: any) => ({ id: doc.id, ...(doc.data ? doc.data() : {}) } as Skill));
   }, demoSkills);
 }
 
@@ -124,7 +110,7 @@ export async function getMessages(): Promise<Message[]> {
       .orderBy("created_at", "desc")
       .limit(100)
       .get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message));
+    return snapshot.docs.map((doc: any) => ({ id: doc.id, ...(doc.data ? doc.data() : {}) } as Message));
   }, demoMessages);
 }
 
@@ -156,27 +142,27 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
     const [total, recent, unread, projectCount, publishedCount, views] =
       await Promise.all([
-        db.collection("page_views").get().then(snapshot => snapshot.size),
-        db
-          .collection("page_views")
-          .where("created_at", ">=", since.toISOString())
-          .get()
-          .then(snapshot => snapshot.size),
-        db
-          .collection("messages")
-          .where("read", "==", false)
-          .get()
-          .then(snapshot => snapshot.size),
-        db.collection("projects").get().then(snapshot => snapshot.size),
-        db
-          .collection("projects")
-          .where("published", "==", true)
-          .get()
-          .then(snapshot => snapshot.size),
-        db
-          .collection("page_views")
-          .where("created_at", ">=", since.toISOString())
-          .get(),
+      db.collection("page_views").get().then((snapshot: any) => snapshot.size),
+      db
+        .collection("page_views")
+        .where("created_at", ">=", since.toISOString())
+        .get()
+        .then((snapshot: any) => snapshot.size),
+      db
+        .collection("messages")
+        .where("read", "==", false)
+        .get()
+        .then((snapshot: any) => snapshot.size),
+      db.collection("projects").get().then((snapshot: any) => snapshot.size),
+      db
+        .collection("projects")
+        .where("published", "==", true)
+        .get()
+        .then((snapshot: any) => snapshot.size),
+      db
+        .collection("page_views")
+        .where("created_at", ">=", since.toISOString())
+        .get(),
       ]);
 
     const buckets = new Map<string, number>();
@@ -188,7 +174,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
     const pageCounts = new Map<string, number>();
     for (const doc of views.docs ?? []) {
-      const data = doc.data();
+      const data = doc.data ? doc.data() : doc;
       const day = String(data.created_at).slice(0, 10);
       if (buckets.has(day)) buckets.set(day, (buckets.get(day) ?? 0) + 1);
       const path = data.path ?? "/";

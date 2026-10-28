@@ -200,6 +200,7 @@ export async function addProjectMedia(formData: FormData): Promise<void> {
   const url = text(formData, "url");
   if (!projectId || !url) return;
 
+  const { adminDb } = await import("./firebase/admin");
   await adminDb.collection("project_media").add({
     project_id: projectId,
     type: text(formData, "type") === "video" ? "video" : "image",
@@ -219,6 +220,7 @@ export async function deleteProjectMedia(formData: FormData): Promise<void> {
   const projectId = text(formData, "project_id");
   if (!id) return;
 
+  const { adminDb } = await import("./firebase/admin");
   await adminDb.collection("project_media").doc(id).delete();
 
   revalidatePath(`/admin/projects/${projectId}`);
