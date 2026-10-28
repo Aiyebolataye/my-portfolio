@@ -171,10 +171,12 @@ export async function saveProject(
   try {
     const { adminDb } = await import("./firebase/admin");
     if (id) {
-      await adminDb.collection("projects").doc(id).update(payload);
+      await adminDb.collection("projects").doc(id).set(payload, { merge: true });
     } else {
       const docRef = await adminDb.collection("projects").add(payload);
-      await docRef.update({ id: docRef.id });
+      try {
+        await docRef.update({ id: docRef.id });
+      } catch {}
     }
     revalidateAll();
     try {
@@ -267,16 +269,23 @@ export async function saveExperience(
     created_at: new Date().toISOString(),
   };
 
-  const { adminDb } = await import("./firebase/admin");
-  if (id) {
-    await adminDb.collection("experience").doc(id).update(payload);
-  } else {
-    const docRef = await adminDb.collection("experience").add(payload);
-    await docRef.update({ id: docRef.id });
-  }
+  try {
+    const { adminDb } = await import("./firebase/admin");
+    if (id) {
+      await adminDb.collection("experience").doc(id).set(payload, { merge: true });
+    } else {
+      const docRef = await adminDb.collection("experience").add(payload);
+      try {
+        await docRef.update({ id: docRef.id });
+      } catch {}
+    }
 
-  revalidateAll();
-  redirect("/admin/experience?saved=1");
+    revalidateAll();
+    redirect("/admin/experience?saved=1");
+  } catch (error) {
+    console.error("saveExperience error", error);
+    return initialError;
+  }
 }
 
 export async function deleteExperience(formData: FormData): Promise<void> {
@@ -322,16 +331,23 @@ export async function updateProfile(
     updated_at: new Date().toISOString(),
   };
 
-  const { adminDb } = await import("./firebase/admin");
-  if (id) {
-    await adminDb.collection("profiles").doc(id).update(payload);
-  } else {
-    const docRef = await adminDb.collection("profiles").add(payload);
-    await docRef.update({ id: docRef.id });
-  }
+  try {
+    const { adminDb } = await import("./firebase/admin");
+    if (id) {
+      await adminDb.collection("profiles").doc(id).set(payload, { merge: true });
+    } else {
+      const docRef = await adminDb.collection("profiles").add(payload);
+      try {
+        await docRef.update({ id: docRef.id });
+      } catch {}
+    }
 
-  revalidateAll();
-  return { ok: true, message: "Profile saved." };
+    revalidateAll();
+    return { ok: true, message: "Profile saved." };
+  } catch (error) {
+    console.error("updateProfile error", error);
+    return initialError;
+  }
 }
 
 export async function addSkill(formData: FormData): Promise<void> {
