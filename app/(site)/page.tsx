@@ -17,10 +17,10 @@ import { getExperience, getProfile, getProjects, getSkills } from "@/lib/data";
 
 export default async function HomePage() {
   const [profile, projects, experience, skills] = await Promise.all([
-    getProfile(),
-    getProjects(),
-    getExperience(),
-    getSkills(),
+    getProfile().catch(() => undefined as any),
+    getProjects().catch(() => [] as any),
+    getExperience().catch(() => [] as any),
+    getSkills().catch(() => [] as any),
   ]);
 
   const skillGroups = skills.reduce<Record<string, string[]>>(
