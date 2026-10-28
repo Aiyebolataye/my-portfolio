@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { hasFirebaseEnv } from "./config";
-import { adminAuth, adminDb } from "./firebase/admin";
 import type { ProjectStatus } from "./types";
 
 export type ActionState = {
@@ -67,6 +66,7 @@ export async function signIn(
   }
 
   try {
+    const { adminAuth } = await import("./firebase/admin");
     const userRecord = await adminAuth.getUserByEmail(email);
     if (!userRecord.emailVerified) {
       return { ok: false, message: "Please verify your email address." };
@@ -118,6 +118,7 @@ export async function sendMessage(
   }
 
   const docId = crypto.randomUUID();
+  const { adminDb } = await import("./firebase/admin");
   await adminDb
     .collection("messages")
     .add({ id: docId, name, email, message, created_at: new Date().toISOString(), read: false });
@@ -167,6 +168,7 @@ export async function saveProject(
     created_at: new Date().toISOString(),
   };
 
+  const { adminDb } = await import("./firebase/admin");
   if (id) {
     await adminDb.collection("projects").doc(id).update(payload);
   } else {
@@ -175,7 +177,9 @@ export async function saveProject(
   }
 
   revalidateAll();
-  revalidatePath(`/projects/${slug}`);
+  try {
+    revalidatePath(`/projects/${slug}`);
+  } catch {}
   redirect("/admin/projects?saved=1");
 }
 
@@ -183,6 +187,7 @@ export async function deleteProject(formData: FormData): Promise<void> {
   if (!hasFirebaseEnv) redirect("/admin/projects");
   const id = text(formData, "id");
   if (id) {
+    const { adminDb } = await import("./firebase/admin");
     await adminDb.collection("projects").doc(id).delete();
   }
   revalidateAll();
@@ -256,6 +261,7 @@ export async function saveExperience(
     created_at: new Date().toISOString(),
   };
 
+  const { adminDb } = await import("./firebase/admin");
   if (id) {
     await adminDb.collection("experience").doc(id).update(payload);
   } else {
@@ -271,6 +277,7 @@ export async function deleteExperience(formData: FormData): Promise<void> {
   if (!hasFirebaseEnv) redirect("/admin/experience");
   const id = text(formData, "id");
   if (id) {
+    const { adminDb } = await import("./firebase/admin");
     await adminDb.collection("experience").doc(id).delete();
   }
   revalidateAll();
@@ -309,6 +316,7 @@ export async function updateProfile(
     updated_at: new Date().toISOString(),
   };
 
+  const { adminDb } = await import("./firebase/admin");
   if (id) {
     await adminDb.collection("profiles").doc(id).update(payload);
   } else {
@@ -326,6 +334,7 @@ export async function addSkill(formData: FormData): Promise<void> {
   const category = text(formData, "category") || "Other";
   if (!name) return;
 
+  const { adminDb } = await import("./firebase/admin");
   await adminDb.collection("skills").add({
     name,
     category,
@@ -333,6 +342,7 @@ export async function addSkill(formData: FormData): Promise<void> {
     created_at: new Date().toISOString(),
   });
   revalidateAll();
+  redirect("/admin/profile?skills=saved");
 }
 
 export async function deleteSkill(formData: FormData): Promise<void> {
@@ -340,6 +350,7 @@ export async function deleteSkill(formData: FormData): Promise<void> {
   const id = text(formData, "id");
   if (!id) return;
 
+  const { adminDb } = await import("./firebase/admin");
   await adminDb.collection("skills").doc(id).delete();
   revalidateAll();
 }
@@ -354,6 +365,7 @@ export async function toggleMessageRead(formData: FormData): Promise<void> {
   const read = text(formData, "read") === "true";
   if (!id) return;
 
+  const { adminDb } = await import("./firebase/admin");
   await adminDb.collection("messages").doc(id).update({ read: !read });
   revalidatePath("/admin/messages");
   revalidatePath("/admin");
@@ -364,6 +376,7 @@ export async function deleteMessage(formData: FormData): Promise<void> {
   const id = text(formData, "id");
   if (!id) return;
 
+  const { adminDb } = await import("./firebase/admin");
   await adminDb.collection("messages").doc(id).delete();
   revalidatePath("/admin/messages");
   revalidatePath("/admin");

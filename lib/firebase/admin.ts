@@ -13,7 +13,9 @@ if (getApps().length) {
     });
   } catch (error) {
     console.error("Failed to initialize Firebase Admin:", error);
-    app = initializeApp();
+    app = initializeApp({
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "portfolio-aiyebola",
+    });
   }
 }
 

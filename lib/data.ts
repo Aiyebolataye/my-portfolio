@@ -1,6 +1,6 @@
 import { hasFirebaseEnv } from "./config";
-import { adminDb } from "./firebase/admin";
-import {
+import { demoExperience, demoMessages, demoProfile, demoProjects, demoSkills } from "./demo-data";
+import type { Experience, Message, Profile, Project, ProjectMedia, Skill } from "./types";
   demoExperience,
   demoMessages,
   demoProfile,
@@ -17,11 +17,12 @@ import type {
 } from "./types";
 
 async function query<T>(
-  run: (db: typeof adminDb) => Promise<T>,
+  run: (db: any) => Promise<T>,
   fallback: T
 ): Promise<T> {
   if (!hasFirebaseEnv) return fallback;
   try {
+    const { adminDb } = await import("./firebase/admin");
     return await run(adminDb);
   } catch {
     return fallback;
