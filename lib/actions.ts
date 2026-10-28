@@ -337,20 +337,25 @@ export async function updateProfile(
   };
 
   try {
+  try {
     const { adminDb } = await import("./firebase/admin");
     if (id) {
-      await adminDb.collection("profiles").doc(id).set(payload, { merge: true });
+      await adminDb.collection("profiles").doc(id).set({ ...payload, id }, { merge: true });
     } else {
       const docRef = await adminDb.collection("profiles").add(payload);
       try {
-        await docRef.update({ id: docRef.id });
+        await adminDb.collection("profiles").doc(docRef.id).set({ ...payload, id: docRef.id }, { merge: true });
       } catch {}
     }
 
     revalidateAll();
     return { ok: true, message: "Profile saved." };
-  } catch (error) {
-    console.error("updateProfile error", error);
+  } catch (error: any) {
+    console.error("updateProfile error", error?.message || error);
+    return initialError;
+  }
+  } catch (error: any) {
+    console.error("updateProfile error", error?.message || error);
     return initialError;
   }
 }
