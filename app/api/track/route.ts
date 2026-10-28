@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { hasFirebaseEnv } from "@/lib/config";
-import { adminDb } from "@/lib/firebase/admin";
 
 export async function POST(request: Request) {
   if (!hasFirebaseEnv) {
     return NextResponse.json({ ok: true, demo: true });
   }
+  
+  try {
+    const { adminDb } = await import("@/lib/firebase/admin");
 
   try {
     const body = (await request.json()) as {
