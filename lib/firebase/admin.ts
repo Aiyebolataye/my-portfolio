@@ -9,7 +9,7 @@ if (getApps().length) {
 } else {
   try {
     app = initializeApp({
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "portfolio-aiyebola",
     });
   } catch (error) {
     console.error("Failed to initialize Firebase Admin:", error);
