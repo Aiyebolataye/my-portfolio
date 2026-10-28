@@ -168,19 +168,23 @@ export async function saveProject(
     created_at: new Date().toISOString(),
   };
 
-  const { adminDb } = await import("./firebase/admin");
-  if (id) {
-    await adminDb.collection("projects").doc(id).update(payload);
-  } else {
-    const docRef = await adminDb.collection("projects").add(payload);
-    await docRef.update({ id: docRef.id });
-  }
-
-  revalidateAll();
   try {
-    revalidatePath(`/projects/${slug}`);
-  } catch {}
-  redirect("/admin/projects?saved=1");
+    const { adminDb } = await import("./firebase/admin");
+    if (id) {
+      await adminDb.collection("projects").doc(id).update(payload);
+    } else {
+      const docRef = await adminDb.collection("projects").add(payload);
+      await docRef.update({ id: docRef.id });
+    }
+    revalidateAll();
+    try {
+      revalidatePath(`/projects/${slug}`);
+    } catch {}
+    redirect("/admin/projects?saved=1");
+  } catch (error) {
+    console.error("saveProject error", error);
+    return initialError;
+  }
 }
 
 export async function deleteProject(formData: FormData): Promise<void> {
