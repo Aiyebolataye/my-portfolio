@@ -126,8 +126,8 @@ export async function sendMessage(
 
     revalidatePath("/admin/messages");
     return { ok: true, message: "Thanks! Your message is on its way." };
-  } catch (error) {
-    console.error("sendMessage error", error);
+  } catch (error: any) {
+    console.error("sendMessage error", error?.message || error);
     return { ok: true, message: "Thanks! Your message is on its way." };
   }
 }
@@ -176,7 +176,7 @@ export async function saveProject(
   try {
     const { adminDb } = await import("./firebase/admin");
     if (id) {
-      await adminDb.collection("projects").doc(id).set(payload, { merge: true });
+      await adminDb.collection("projects").doc(id).set({ ...payload, id }, { merge: true });
     } else {
       const docRef = await adminDb.collection("projects").add(payload);
       try {
@@ -188,8 +188,8 @@ export async function saveProject(
       revalidatePath(`/projects/${slug}`);
     } catch {}
     redirect("/admin/projects?saved=1");
-  } catch (error) {
-    console.error("saveProject error", error);
+  } catch (error: any) {
+    console.error("saveProject error", error?.message || error);
     return initialError;
   }
 }

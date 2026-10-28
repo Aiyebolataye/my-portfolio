@@ -12,7 +12,7 @@ if (getApps().length) {
     if (key && key.trim().startsWith("{")) {
       try {
         const serviceAccount = JSON.parse(key);
-        app = initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id });
+        app = initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID });
       } catch {
         app = initializeApp({ projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "portfolio-aiyebola" });
       }
